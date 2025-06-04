@@ -1,0 +1,157 @@
+# Grammar 使用文档
+
+## Grammar 语法
+
+### namespace
+
+命名空间，类似Java语言中的package，用来定义模版，可以导入其他namespace中定义的模版。
+
+**示例：**
+
+```plaintext
+namespace navigation
+import system.number :: natural_number_type; // 使用system.number中的natural_number_type模版
+```
+
+### 模版类型
+
+#### clause
+
+clause用来匹配子句，类似定义一个变量名，在statement中引用变量名，在clause中可以引用clause和prime。引用clause时不需要加引号，否则当字符串处理而非变量。
+
+**示例：**
+
+```plaintext
+帮我: ("请"|"能否"|"能不能")? "帮" ("我"|"俺") ; //定义clause 帮我 这个变量
+打开： 帮我 ("打开"|"开启") ; // 定义 打开 clause 同时引用 帮我 clause 无需添加引号
+```
+
+#### prime
+
+prime用来匹配词槽，不可引用其他模版。可用prime作词槽归一化，通过注解`@type`标识指定词槽key，同时定义的变量名称需要使用`< >`引起来。
+
+**示例：**
+
+```plaintext
+@type(name="navi.app")
+<导航软件>: ("百度" | "高德" | "搜狗") ("地图" | "导航"); //定义模版导航软件 词槽key为navi.app，对地图软件归一
+```
+
+#### statement
+
+statement用来匹配整句，在statement中可以使用clause和prime，通过注解`@statement`标识，同时可以通过`@attr`注解指定自定义的静态属性，当匹配到该statement时，即可获取这些属性信息。
+
+**示例：**
+
+```plaintext
+@attr(intention="open_navi", key1=258, key2=true, key3="abcd")
+@statement
+打开导航: 打开 "一"? "下" <导航软件> ; //该statement引用了打开clause和导航软件prime
+```
+
+### 宏展开
+
+提高模板可重用性，通过代入参数可扩展出具有相似结构的多个模板，类似定义一个函数方法。
+
+**示例：**
+
+```plaintext
+二元组合(a,b): $a $b | $b $a;
+@attr(intention="open_navi", key1=258)
+@statement
+打开导航: 二元组合(打开, <导航软件>) ; //定义该statment即可实现匹配“帮我打开百度地图”以及“百度地图帮我打开”
+```
+
+## Grammar 模版表达式
+
+### 顺序匹配
+
+按照顺序匹配A B C，中间空格。
+
+**示例：**
+
+```plaintext
+帮我: "请"? "帮我" // 中间按照顺序匹配
+```
+
+### 或匹配
+
+或匹配A|B|C，用`|`区分，与正则表达式一致。
+
+**示例：**
+
+```plaintext
+<导航软件>: ("百度"|"高德"|"搜狗") ("地图" | "导航"); // 匹配“百度地图”“百度导航”“高德地图”“高德导航”...
+```
+
+### 可选匹配
+
+可选匹配A?，用`?`区分，与正则表达式一致。
+
+**示例：**
+
+```plaintext
+帮我: "请"? "帮我" // 可匹配“帮我”“请帮我”
+```
+
+### 重复匹配
+
+重复匹配A+，B*，C{2,5}，与正则表达式一致，不再举例。
+
+### 字符串匹配
+
+字符串匹配只需要引号标识“帮我”，不加引号代表clause，如果引用了没有定义的clause或prime，编译报错。
+
+### clause匹配
+
+见上面模版类型中clause模块。
+
+### slot匹配
+
+见上面模版类型中prime模块。
+
+### 宏展开
+
+见上面宏展开模块。
+
+### 属性赋值
+
+属性赋值通过`<( )>`格式实现，需要赋值的slot后添加`<(key=value)>`的方式，匹配后可通过key获取value进行业务逻辑判断。
+
+**示例：**
+
+```plaintext
+"从" <地点> <*(loc="departure")> "去" <地点> <*(loc="arrival")>
+车窗 打开 “一点” ("点" <*( a_little=true )>)?
+```
+
+### 脚本
+
+通过脚本可以执行一些简单的数学计算，脚本通过`<(_.r= )>`方式实现。
+
+**示例：**
+
+```plaintext
+"一百" <( a=100; )> ("加" <( op="+";)>|"减" <( op="-";)> ) "二十" <( b=20; )>
+<(_.r = op == "+" ? a + b : a – b; )>
+```
+
+## Grammar 常用注解
+
+### @statement
+
+用于定义功能点整句匹配模版，只有`@statement`定义的模版才会去匹配。
+
+### @type
+
+用于指定词槽的类型。
+
+### @attr
+
+用于自定义静态属性，同时通过`<*(key=value)>`可为slot自定义动态属性。
+
+## Grammar 注意事项
+
+1. 在文件后缀名为`.cld`的文件中写grammar，完成后在Maven中配置插件`grammar-maven-plugin`插件，编译时自动编译指定目录下的语法文件并生成目标文件（如`grammar.json.gz`），通过加载`grammar.json.gz`完成语法加载。
+2. 每次更改`.cld`语法文件后，需要重新编译生效。
+3. 应避免两个任意字符匹配放在一起，影响性能。

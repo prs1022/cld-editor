@@ -1,0 +1,124 @@
+/* 基础样式 */
+code[class*="language-"],
+pre[class*="language-"] {
+  color: #d4d4d4;
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  direction: ltr;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  line-height: 1.5;
+  tab-size: 4;
+  hyphens: none;
+  background: #1e1e1e;
+}
+
+/* 关键词 */
+.token.keyword {
+  color: #569cd6;
+  font-weight: bold;
+}
+
+/* 注解 */
+.token.annotation {
+  color: #c586c0;
+  font-weight: bold;
+}
+
+/* 词槽 */
+.token.slot {
+  color: #4ec9b0;
+}
+
+/* 宏定义和调用 */
+.token.macro .function {
+  color: #dcdcaa;
+}
+
+/* 宏参数引用 */
+.token.macro-param {
+  color: #9cdcfe;
+}
+
+/* 脚本 */
+.token.script {
+  color: #d7ba7d;
+}
+
+.token.script .variable {
+  color: #9cdcfe;
+}
+
+.token.script .keyword {
+  color: #569cd6;
+}
+
+.token.script .number {
+  color: #b5cea8;
+}
+
+/* 动态属性 */
+.token.dynamic-attr {
+  color: #d7ba7d;
+}
+
+.token.dynamic-attr .string {
+  color: #ce9178;
+}
+
+.token.dynamic-attr .boolean {
+  color: #569cd6;
+}
+
+/* 字符串 */
+.token.string {
+  color: #ce9178;
+}
+
+/* 注释 */
+.token.comment {
+  color: #6a9955;
+  font-style: italic;
+}
+
+/* 操作符 */
+.token.operator {
+  color: #d4d4d4;
+}
+
+/* 标点符号 */
+.token.punctuation {
+  color: #d4d4d4;
+}
+
+/* 新的编辑器样式 */
+.editor-wrapper {
+  flex: 1;
+  overflow: auto;
+  position: relative;
+  background-color: #1e1e1e;
+}
+
+.editor-instance {
+  min-height: 100%;
+  width: 100%;
+}
+
+/* react-simple-code-editor的内部元素样式 */
+.editor-instance > textarea {
+  outline: none !important;
+  resize: none !important;
+}
+
+.editor-instance > pre,
+.editor-instance > textarea {
+  white-space: pre !important;
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+.editor-instance > pre::-webkit-scrollbar,
+.editor-instance > textarea::-webkit-scrollbar {
+  display: none !important;
+}

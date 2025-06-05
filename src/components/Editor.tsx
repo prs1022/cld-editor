@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import Editor from 'react-simple-code-editor';
 import { highlight, languages } from 'prismjs';
@@ -9,6 +9,8 @@ import '../styles/prism-cld.css';
 
 // 导入Prism的基础样式
 import 'prismjs/themes/prism-dark.css';
+import { SyntaxValidator } from '../validators/SyntaxValidator';
+import { SyntaxError } from '../validators/SenseErrorListener';
 
 type EditorProps = {
   content: string;
@@ -19,6 +21,31 @@ type EditorProps = {
 
 export default function CodeEditor({ content, onChange, onSave, isDirty }: EditorProps) {
   const editorContainerRef = useRef<HTMLDivElement>(null);
+  const [syntaxErrors, setSyntaxErrors] = useState<SyntaxError[]>([]);
+  const syntaxValidator = useMemo(() => new SyntaxValidator(), []);
+  
+  // 添加语法验证
+  const validateSyntax = useCallback((code: string) => {
+    try {
+      // 恢复语法验证
+      const result = syntaxValidator.validate(code);
+      setSyntaxErrors(result.syntaxErrors);
+      return result.syntaxErrors;
+    } catch (error) {
+      console.error('语法验证过程中发生错误:', error);
+      setSyntaxErrors([]);
+      return [];
+    }
+  }, [syntaxValidator]);
+  
+  // 在内容变化时进行验证，可以添加防抖以提高性能
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      validateSyntax(content);
+    }, 500); // 500ms防抖
+    
+    return () => clearTimeout(timeoutId);
+  }, [content, validateSyntax]);
   
   // 添加键盘事件监听，支持Ctrl+S保存
   useEffect(() => {
@@ -43,9 +70,28 @@ export default function CodeEditor({ content, onChange, onSave, isDirty }: Edito
 
   // 高亮函数
   const highlightWithLineNumbers = (code: string) => {
-    return highlight(code, languages.cld, 'cld');
+    // 基本语法高亮
+    const highlighted = highlight(code, languages.cld, 'cld');
+    
+    // 如果需要，可以在这里添加错误标记的逻辑
+    return highlighted;
   };
-
+  
+  // 渲染错误提示
+  const renderErrorMarkers = () => {
+    if (syntaxErrors.length === 0) return null;
+    
+    return (
+      <div className="error-markers">
+        {syntaxErrors.map((error, index) => (
+          <div key={index} className="error-item">
+            行 {error.line}:{error.charPositionInLine} - {error.msg}
+          </div>
+        ))}
+      </div>
+    );
+  };
+  
   return (
     <div className="flex flex-col h-full">
       <div className="flex justify-between items-center p-2 border-b border-gray-700">
@@ -69,16 +115,18 @@ export default function CodeEditor({ content, onChange, onSave, isDirty }: Edito
           value={content}
           onValueChange={onChange}
           highlight={highlightWithLineNumbers}
-          padding={16}
+          padding={10}
           className="editor-instance"
-          placeholder="Select a .cld file to edit..."
           style={{
-            fontFamily: '"Consolas", "Monaco", monospace',
+            fontFamily: '"Fira code", "Fira Mono", monospace',
             fontSize: 14,
+            overflow: 'visible',
+            minHeight: '100%',
+            height: 'auto'
           }}
-          textareaId="cld-editor"
         />
       </div>
+      {renderErrorMarkers()}
     </div>
   );
 }

@@ -13,4 +13,17 @@ function getPlugins() {
 
 export default defineConfig({
   plugins: getPlugins(),
+  resolve: {
+    alias: {
+      // 如果需要，可以添加别名
+    }
+  },
+  optimizeDeps: {
+    include: ['antlr4ts']
+  },
+  build: {
+    commonjsOptions: {
+      include: [/antlr4ts/, /node_modules/]
+    }
+  }
 });

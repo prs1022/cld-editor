@@ -122,3 +122,19 @@ pre[class*="language-"] {
 .editor-instance > textarea::-webkit-scrollbar {
   display: none !important;
 }
+
+/* 错误标记样式 */
+.error-markers {
+  background-color: #2d2d2d;
+  color: #f44336;
+  padding: 8px;
+  border-top: 1px solid #444;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.error-item {
+  margin-bottom: 4px;
+  font-family: monospace;
+  font-size: 12px;
+}

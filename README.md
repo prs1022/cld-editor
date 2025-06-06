@@ -29,6 +29,10 @@ pnpm run dev
 
 - 在浏览器访问 http://localhost:3000
 
+## 实际使用
+![Uploading image.png…]()
+
+
 ## CLD语法高亮效果说明
 编辑器中的CLD语法高亮效果如下：
 

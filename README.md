@@ -30,7 +30,9 @@ pnpm run dev
 - 在浏览器访问 http://localhost:3000
 
 ## 实际使用
-![Uploading image.png…]()
+![](./doc/20250606-144221.jpeg)
+![](./doc/20250606-144324.jpeg)
+
 
 
 ## CLD语法高亮效果说明
